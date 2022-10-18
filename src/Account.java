@@ -2,23 +2,23 @@ import java.util.ArrayList;
 import java.time.LocalDateTime; // Import the LocalDateTime class
 import java.time.format.DateTimeFormatter; // Import the DateTimeFormatter class
 public class Account {
-    private final int PIN;
+    private final String PASSWORD;
     private final String USERNAME;
     private final String ACCOUNT_NUM;
     private double balance;
     private ArrayList<String> transactionHistory;
 
-    public Account(String username, String accountNum, int pin){
+    public Account(String username, String accountNum, String password){
         this.USERNAME = username;
         this.ACCOUNT_NUM = accountNum;
-        this.PIN = pin;
+        this.PASSWORD = password;
         this.transactionHistory = new ArrayList<String>();
     }
 
-    public Account(String username, String accountNum, int pin, ArrayList<String> transactionHistory){
+    public Account(String username, String accountNum, String password, ArrayList<String> transactionHistory){
         this.USERNAME = username;
         this.ACCOUNT_NUM = accountNum;
-        this.PIN = pin;
+        this.PASSWORD = password;
         this.transactionHistory = transactionHistory;
     }
     private static String getDateAndTime(){
@@ -30,7 +30,9 @@ public class Account {
     public void makeDeposit(double amount){
         if(amount > 0){
             balance += amount;
-            String transaction = "Deposited: $" + String.format("%.2f", amount) + "\nOn: " + getDateAndTime();
+            String transaction = "Deposited: $" + String.format("%.2f", amount) +
+                    "\nOn: " + getDateAndTime() +
+                    "\nNew Balance: $" + String.format("%.2f", getBalance());
             transactionHistory.add(transaction);
             System.out.println(transaction);
         }
@@ -42,12 +44,14 @@ public class Account {
     public void makeWithdrawal(double amount){
         if(amount > 0 && balance > amount){
             balance -= amount;
-            String transaction = "Withdrew: $" + String.format("%.2f", amount) + "\nOn: " + getDateAndTime();
+            String transaction = "Withdrew: $" + String.format("%.2f", amount) +
+                    "\nOn: " + getDateAndTime() +
+                    "\nNew Balance: $" + String.format("%.2f", getBalance());
             transactionHistory.add(transaction);
             System.out.println(transaction);
         }
         else if(balance < amount){
-            System.out.println("Amount exceeds current balance! Balance: $ " + String.format("%.2f", amount));
+            System.out.println("Amount exceeds current balance! Balance: $ " + String.format("%.2f", getBalance()));
         }
         else{
             System.out.println("Cannot withdraw negative sums!");
@@ -61,7 +65,8 @@ public class Account {
             String transaction = "Transferred: $" + String.format("%.2f", amount) +
                     "\nTo Account: " + toAcc.getAccountNum() +
                     "\nHolder: " + toAcc.getUsername() +
-                    "\nOn: " + getDateAndTime();
+                    "\nOn: " + getDateAndTime() +
+                    "\nNew Balance: $" + String.format("%.2f", getBalance());
             transactionHistory.add(transaction);
             System.out.println(transaction);
         }
@@ -82,8 +87,8 @@ public class Account {
                 "\nOn: " + getDateAndTime();
         transactionHistory.add(transaction);
     }
-    public int getPin() {
-        return PIN;
+    public boolean checkPassword(String password) {
+        return PASSWORD.equals(password);
     }
     public String getUsername(){
         return USERNAME;
@@ -91,9 +96,17 @@ public class Account {
     public String getAccountNum(){
         return ACCOUNT_NUM;
     }
-
-    public ArrayList<String> getTransactionHistory() {
-        return transactionHistory;
+    public double getBalance(){ return balance; }
+    public void viewTransactionHistory() {
+        if(transactionHistory.isEmpty()){
+            System.out.println("No transaction history yet.");
+        }
+        else{
+            for(String trans: this.transactionHistory){
+                System.out.println(trans);
+                System.out.println();
+            }
+        }
     }
 
 }

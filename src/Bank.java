@@ -2,11 +2,22 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Random;
-
+import java.util.Scanner;
 public class Bank {
     HashMap<String, Account> customerAccounts;
     double totalAccountBalances;
 
+    Bank(){
+        try{
+            for(Account acc: customerAccounts.values()) {
+                totalAccountBalances += acc.getBalance();
+            }
+        }
+        catch (NullPointerException e){
+            customerAccounts = new HashMap<String, Account>();
+            totalAccountBalances = 0.0;
+        }
+    }
     private String makeAccountNumber(){
         char [] alphabet = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
                 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
@@ -24,15 +35,155 @@ public class Bank {
         return accNumber;
     }
 
-    public Account getAccount(String accountNum){
-        return customerAccounts.get(accountNum);
+    private Account getAccount(String accountNum){
+        return customerAccounts.getOrDefault(accountNum, null);
     }
 
-    public Account makeNewAccount(String name, int pin){
+    private Account makeNewAccount(String name, String password){
         String accountNumber = makeAccountNumber();
-        Account newAcc = new Account(name, accountNumber, pin);
+        Account newAcc = new Account(name, accountNumber, password);
         customerAccounts.put(accountNumber, newAcc);
 
         return newAcc;
+    }
+
+    private void DeleteAccount(String accountNum, String password){
+        if(getAccount(accountNum).checkPassword(password)){
+            Account deleted = customerAccounts.remove(accountNum);
+            System.out.println("Deleted Account: " + deleted.getAccountNum() + "\nHolder: " + deleted.getUsername());
+        }
+        System.out.println("Account Number: " + accountNum + " does not exist.");
+    }
+
+    private Account loginScreen(Scanner input){
+        int optn = -1;
+        System.out.print("Would you like to:\n1. Login,\n2. Create an Account.\n>");
+        try{
+            // better than .nextInt()
+            // ref: https://stackoverflow.com/questions/26586489/integer-parseintscanner-nextline-vs-scanner-nextint
+            optn = Integer.parseInt(input.nextLine());
+        }
+        catch (NumberFormatException e){};
+
+        if(optn == 1){
+            System.out.print("Account Number: ");
+            String accNum = input.nextLine();
+            System.out.print("Account Password: ");
+            String password = input.nextLine();
+
+            if(getAccount(accNum).checkPassword(password)){
+                System.out.println("\nLogin Successful!\n");
+                return getAccount(accNum);
+            }
+            else{
+                System.out.println("Invalid Account Number or Password!");
+                return null;
+            }
+        }
+        else if(optn == 2){
+            System.out.print("Enter you full name: ");
+            String fullName = input.nextLine();
+            System.out.print("Enter a new password: ");
+            String password = input.nextLine();
+
+            Account newAcc = makeNewAccount(fullName, password);
+            System.out.println("\nAccount created successfully!\nNew Account Number: "
+                    + newAcc.getAccountNum() + "\n");
+            return newAcc;
+        }
+        else{
+            System.out.println("Invalid option!\n");
+            return null;
+        }
+    }
+
+    public void menu(){
+        Scanner input = new Scanner(System.in);
+        System.out.println("Welcome to Unbankrupt Yourself!\n");
+        Account acc = loginScreen(input);
+        input.nextLine();
+
+        if(acc == null){
+            return;
+        }
+
+        while(true){
+            int optn = -1;
+            System.out.println("What would you like to do?");
+            System.out.println();
+            System.out.println("1. Check your balance");
+            System.out.println("2. Make a deposit");
+            System.out.println("3. Make a withdrawal");
+            System.out.println("4. Make a transfer");
+            System.out.println("5. View past transactions");
+            System.out.println("6. Exit");
+            System.out.print(">");
+            try{
+            optn = Integer.parseInt(input.nextLine());
+            }
+            catch (NumberFormatException e){};
+
+            System.out.println();
+
+            switch (optn){
+                case 1:
+                    System.out.println("Your Current Balance is: $" + acc.getBalance());
+                    input.nextLine();
+                    break;
+                case 2:
+                    System.out.println("How much would you like to deposit?");
+                    System.out.print("> $");
+                    double dep_amnt = Double.parseDouble(input.nextLine());
+                    System.out.println();
+
+                    acc.makeDeposit(dep_amnt);
+
+                    input.nextLine();
+                    break;
+                case 3:
+                    System.out.println("How much would you like to withdraw?");
+                    System.out.print("> $");
+                    double wdr_amnt = Double.parseDouble(input.nextLine());
+                    System.out.println();
+
+                    acc.makeWithdrawal(wdr_amnt);
+
+                    input.nextLine();
+                    break;
+                case 4:
+                    System.out.println("How much would you like to transfer?");
+                    System.out.print("> $");
+                    double trans_amnt = Double.parseDouble(input.nextLine());
+
+                    System.out.println("Destination Account number?");
+                    System.out.print(">");
+                    String destAccNum = input.nextLine();
+                    System.out.println();
+
+                    Account destAcc = getAccount(destAccNum);
+                    if(destAcc == null){
+                        break;
+                    }
+
+                    acc.transfer(destAcc, trans_amnt);
+
+                    input.nextLine();
+                    break;
+                case 5:
+                    System.out.println("Transaction history:");
+                    acc.viewTransactionHistory();
+
+                    input.nextLine();
+                    break;
+                case 6:
+                    System.out.println("Thank you for banking with us!");
+                    input.nextLine();
+                    return;
+                default:
+                    System.out.println("\nInvalid option. Please select options 1 - 6.\n");
+                    break;
+            }
+        }
+
     }
 }
