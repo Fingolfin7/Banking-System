@@ -2,23 +2,23 @@ import java.util.ArrayList;
 import java.time.LocalDateTime; // Import the LocalDateTime class
 import java.time.format.DateTimeFormatter; // Import the DateTimeFormatter class
 public class Account {
-    private int pin;
-    private String username;
-    private String accountNum;
+    private final int PIN;
+    private final String USERNAME;
+    private final String ACCOUNT_NUM;
     private double balance;
     private ArrayList<String> transactionHistory;
 
     public Account(String username, String accountNum, int pin){
-        this.username = username;
-        this.accountNum = accountNum;
-        this.pin = pin;
+        this.USERNAME = username;
+        this.ACCOUNT_NUM = accountNum;
+        this.PIN = pin;
         this.transactionHistory = new ArrayList<String>();
     }
 
     public Account(String username, String accountNum, int pin, ArrayList<String> transactionHistory){
-        this.username = username;
-        this.accountNum = accountNum;
-        this.pin = pin;
+        this.USERNAME = username;
+        this.ACCOUNT_NUM = accountNum;
+        this.PIN = pin;
         this.transactionHistory = transactionHistory;
     }
     private static String getDateAndTime(){
@@ -57,7 +57,7 @@ public class Account {
     public Account transfer(Account toAcc, double amount){
         if(amount > 0 && balance > amount){
             balance -= amount;
-            toAcc.receiveTransfer(accountNum, username, amount);
+            toAcc.receiveTransfer(ACCOUNT_NUM, USERNAME, amount);
             String transaction = "Transferred: $" + String.format("%.2f", amount) +
                     "\nTo Account: " + toAcc.getAccountNum() +
                     "\nHolder: " + toAcc.getUsername() +
@@ -83,13 +83,13 @@ public class Account {
         transactionHistory.add(transaction);
     }
     public int getPin() {
-        return pin;
+        return PIN;
     }
     public String getUsername(){
-        return username;
+        return USERNAME;
     }
     public String getAccountNum(){
-        return accountNum;
+        return ACCOUNT_NUM;
     }
 
     public ArrayList<String> getTransactionHistory() {
