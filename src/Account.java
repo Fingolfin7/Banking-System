@@ -15,15 +15,24 @@ public class Account {
         this.transactionHistory = new ArrayList<String>();
     }
 
-    public Account(String username, String accountNum, String password, ArrayList<String> transactionHistory){
+    public Account(String username, String accountNum, String password, double balance){
         this.USERNAME = username;
         this.ACCOUNT_NUM = accountNum;
         this.PASSWORD = password;
+        this.balance = balance;
+        this.transactionHistory = new ArrayList<String>();
+    }
+    public Account(String username, String accountNum, String password,
+                   double balance, ArrayList<String> transactionHistory){
+        this.USERNAME = username;
+        this.ACCOUNT_NUM = accountNum;
+        this.PASSWORD = password;
+        this.balance = balance;
         this.transactionHistory = transactionHistory;
     }
     private static String getDateAndTime(){
         LocalDateTime myDateObj = LocalDateTime.now();
-        DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm");
+        DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm:ss");
         return myDateObj.format(myFormatObj);
     }
 
@@ -71,7 +80,7 @@ public class Account {
             System.out.println(transaction);
         }
         else if(balance < amount){
-            System.out.println("Amount exceeds current balance! Balance: $ " + String.format("%.2f", amount));
+            System.out.println("Amount exceeds current balance! Balance: $ " + String.format("%.2f", getBalance()));
         }
         else{
             System.out.println("Cannot transfer negative sums!");
@@ -84,12 +93,15 @@ public class Account {
         String transaction = "Received: $" + String.format("%.2f", amount) +
                 "\nFrom Account: " + accountNum+
                 "\nHolder: " + username +
-                "\nOn: " + getDateAndTime();
+                "\nOn: " + getDateAndTime() +
+                "\nNew Balance: $" + String.format("%.2f", getBalance());;
         transactionHistory.add(transaction);
     }
     public boolean checkPassword(String password) {
         return PASSWORD.equals(password);
     }
+
+    public String getPassword(){ return PASSWORD; }
     public String getUsername(){
         return USERNAME;
     }
@@ -109,4 +121,7 @@ public class Account {
         }
     }
 
+    public ArrayList<String> getTransactionHistory(){
+        return transactionHistory;
+    }
 }

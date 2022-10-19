@@ -4,18 +4,22 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 public class Bank {
-    HashMap<String, Account> customerAccounts;
-    double totalAccountBalances;
+    private final DatabaseManager BANKDB;
+    private final HashMap<String, Account> CUSTOMER_ACCOUNTS;
+    private double totalAccountBalances;
 
     Bank(){
-        try{
-            for(Account acc: customerAccounts.values()) {
+        BANKDB = new DatabaseManager();
+        CUSTOMER_ACCOUNTS = BANKDB.loadData();
+
+        if(CUSTOMER_ACCOUNTS != null && !CUSTOMER_ACCOUNTS.isEmpty()){
+            for(Account acc: CUSTOMER_ACCOUNTS.values()) {
                 totalAccountBalances += acc.getBalance();
             }
         }
-        catch (NullPointerException e){
-            customerAccounts = new HashMap<String, Account>();
+        else{
             totalAccountBalances = 0.0;
+            //CUSTOMER_ACCOUNTS = new HashMap<String, Account>();
         }
     }
     private String makeAccountNumber(){
@@ -30,26 +34,26 @@ public class Bank {
 
             int rnd = new Random().nextInt(alphabet.length);
             accNumber = alphabet[rnd] + number;
-        }while(customerAccounts.containsKey(accNumber));
+        }while(CUSTOMER_ACCOUNTS.containsKey(accNumber));
 
         return accNumber;
     }
 
     private Account getAccount(String accountNum){
-        return customerAccounts.getOrDefault(accountNum, null);
+        return CUSTOMER_ACCOUNTS.getOrDefault(accountNum, null);
     }
 
     private Account makeNewAccount(String name, String password){
         String accountNumber = makeAccountNumber();
         Account newAcc = new Account(name, accountNumber, password);
-        customerAccounts.put(accountNumber, newAcc);
+        CUSTOMER_ACCOUNTS.put(accountNumber, newAcc);
 
         return newAcc;
     }
 
     private void DeleteAccount(String accountNum, String password){
         if(getAccount(accountNum).checkPassword(password)){
-            Account deleted = customerAccounts.remove(accountNum);
+            Account deleted = CUSTOMER_ACCOUNTS.remove(accountNum);
             System.out.println("Deleted Account: " + deleted.getAccountNum() + "\nHolder: " + deleted.getUsername());
         }
         System.out.println("Account Number: " + accountNum + " does not exist.");
@@ -95,6 +99,10 @@ public class Bank {
             System.out.println("Invalid option!\n");
             return null;
         }
+    }
+
+    public void print(){
+        System.out.println(CUSTOMER_ACCOUNTS.toString());
     }
 
     public void menu(){
@@ -177,7 +185,16 @@ public class Bank {
                     break;
                 case 6:
                     System.out.println("Thank you for banking with us!");
-                    input.nextLine();
+                    boolean success = BANKDB.saveData(CUSTOMER_ACCOUNTS);
+                    if(!success){
+                        System.out.println("Failed to save data to database. Exit anyway?");
+                        System.out.println("1. Yes (y),\n2. No (n)");
+                        char qt = input.nextLine().charAt(0);
+
+                        if(qt == 'n' || qt == 'N'){
+                            break;
+                        }
+                    }
                     return;
                 default:
                     System.out.println("\nInvalid option. Please select options 1 - 6.\n");
