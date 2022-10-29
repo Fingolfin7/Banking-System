@@ -3,6 +3,8 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
+import java.lang.System.*;
+
 public class Bank {
     private final DatabaseManager BANKDB;
     private final HashMap<String, Account> CUSTOMER_ACCOUNTS;
@@ -19,7 +21,6 @@ public class Bank {
         }
         else{
             totalAccountBalances = 0.0;
-            //CUSTOMER_ACCOUNTS = new HashMap<String, Account>();
         }
     }
     private String makeAccountNumber(){
@@ -56,7 +57,12 @@ public class Bank {
             Account deleted = CUSTOMER_ACCOUNTS.remove(accountNum);
             System.out.println("Deleted Account: " + deleted.getAccountNum() + "\nHolder: " + deleted.getUsername());
         }
-        System.out.println("Account Number: " + accountNum + " does not exist.");
+        else if(getAccount(accountNum) == null){
+            System.out.println("Account Number: " + accountNum + " does not exist.");
+        }
+        else{
+            System.out.println("Incorrect password!");
+        }
     }
 
     private Account loginScreen(Scanner input){
@@ -75,12 +81,16 @@ public class Bank {
             System.out.print("Account Password: ");
             String password = input.nextLine();
 
+            if(getAccount(accNum) == null){
+                System.out.println("\nAccount Number: " + accNum + " does not exist.");
+                return null;
+            }
             if(getAccount(accNum).checkPassword(password)){
                 System.out.println("\nLogin Successful!\n");
                 return getAccount(accNum);
             }
             else{
-                System.out.println("Invalid Account Number or Password!");
+                System.out.println("\nIncorrect password!");
                 return null;
             }
         }
@@ -101,10 +111,6 @@ public class Bank {
         }
     }
 
-    public void print(){
-        System.out.println(CUSTOMER_ACCOUNTS.toString());
-    }
-
     public void menu(){
         Scanner input = new Scanner(System.in);
         System.out.println("Welcome to Unbankrupt Yourself!\n");
@@ -123,7 +129,7 @@ public class Bank {
             System.out.println("2. Make a deposit");
             System.out.println("3. Make a withdrawal");
             System.out.println("4. Make a transfer");
-            System.out.println("5. View past transactions");
+            System.out.println("5. View account statement");
             System.out.println("6. Exit");
             System.out.print(">");
             try{
@@ -178,7 +184,7 @@ public class Bank {
                     input.nextLine();
                     break;
                 case 5:
-                    System.out.println("Transaction history:");
+                    System.out.println("Account Statement:");
                     acc.viewTransactionHistory();
 
                     input.nextLine();

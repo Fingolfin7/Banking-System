@@ -1,6 +1,7 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import static java.lang.System.exit;
 
 public class DatabaseManager {
     Connection con;
@@ -15,9 +16,15 @@ public class DatabaseManager {
             con = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/bankdb","root","");
         }
-        catch(Exception e){
-            System.out.println(e.toString());
+        catch (ClassNotFoundException | SQLException e){
+            System.out.println("Connection to database has failed. Please make sure the database is running.\n");
+            System.out.println(e.getMessage());
+            exit(-1);
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+            exit(-1);
         }
+        /**/
     }
 
     public boolean saveData(HashMap<String, Account> customerAccounts){
