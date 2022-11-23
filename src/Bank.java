@@ -194,14 +194,17 @@ public class Bank {
                     boolean success = BANKDB.saveData(CUSTOMER_ACCOUNTS);
                     if(!success){
                         System.out.println("Failed to save data to database. Exit anyway?");
-                        System.out.println("1. Yes (y),\n2. No (n)");
+                        System.out.println("Yes (y) / No (n)");
+                        System.out.println("> ");
                         char qt = input.nextLine().charAt(0);
 
-                        if(qt == 'n' || qt == 'N'){
+                        if(qt == 'y' || qt == 'Y'){
+                            return;
+                        }
+                        else{
                             break;
                         }
                     }
-                    return;
                 default:
                     System.out.println("\nInvalid option. Please select options 1 - 6.\n");
                     break;
